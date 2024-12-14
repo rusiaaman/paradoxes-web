@@ -6,27 +6,13 @@ import TypeWriter from './TypeWriter';
 
 const GameScene = ({ onGameOver }) => {
   const [gameState, setGameState] = useState(initializeGame());
-  const [message, setMessage] = useState({ 
-    text: "Choose a door! One has a car, the others have goats.", 
+  const [message, setMessage] = useState({
+    text: "Choose a door! One has a car, the others have goats.",
     typing: false,
-    id: 0 // Add an ID to track message changes
+    id: 0,
+    speed: 'normal'
   });
   const [showButtons, setShowButtons] = useState(false);
-  const [messageQueue, setMessageQueue] = useState([]);
-  
-  // Handle message queue
-  useEffect(() => {
-    if (messageQueue.length > 0 && !message.typing) {
-      const nextMessage = messageQueue[0];
-      setMessage({ text: nextMessage.text, typing: true, id: nextMessage.id });
-      setMessageQueue(prev => prev.slice(1));
-    }
-  }, [messageQueue, message.typing]);
-
-  const queueMessage = (text, onComplete) => {
-    const messageId = Date.now();
-    setMessageQueue(prev => [...prev, { text, id: messageId, onComplete }]);
-  };
 
   const fadeIn = useSpring({
     from: { opacity: 0 },
@@ -35,10 +21,8 @@ const GameScene = ({ onGameOver }) => {
   });
 
   const handleDoorSelect = (doorNumber) => {
-    // Allow selection in initial phase or after Monty opens a door
     if (gameState.gamePhase !== 'initial' && gameState.gamePhase !== 'montyRevealed') return;
 
-    // Initial door selection
     if (gameState.gamePhase === 'initial') {
       setGameState(prev => ({
         ...prev,
@@ -48,14 +32,31 @@ const GameScene = ({ onGameOver }) => {
 
       const montyDoor = getMontyChoice(gameState.doors, doorNumber);
 
-      // Queue all messages
-      setMessageQueue([]);  // Clear any existing queue
-      queueMessage("Here's a twist...");
-      
-      setTimeout(() => {
-        queueMessage("I'll reveal one of the doors that has a goat.");
-        
+      const showInitialMessage = () => {
+        setMessage({
+          text: "Here's a twist...",
+          typing: true,
+          id: Date.now(),
+          speed: 'fast'
+        });
+
         setTimeout(() => {
+          setMessage(prev => ({ ...prev, typing: false }));
+          showSecondMessage();
+        }, 1500);
+      };
+
+      const showSecondMessage = () => {
+        setMessage({
+          text: "I'll reveal one of the doors that has a goat.",
+          typing: true,
+          id: Date.now(),
+          speed: 'normal'
+        });
+
+        setTimeout(() => {
+          setMessage(prev => ({ ...prev, typing: false }));
+          // Open Monty's door
           setGameState(prev => ({
             ...prev,
             doors: {
@@ -66,60 +67,95 @@ const GameScene = ({ onGameOver }) => {
             gamePhase: 'montyRevealed'
           }));
 
-          setTimeout(() => {
-            queueMessage(
-              "Would you now like to stay with your decision or choose the other door?",
-              () => setTimeout(() => setShowButtons(true), 500)
-            );
-          }, 1500);
-        }, 3500);
-      }, 1000);
+          setTimeout(showFinalMessage, 1500);
+        }, 2500);
+      };
+
+      const showFinalMessage = () => {
+        setMessage({
+          text: "Would you now like to stay with your decision or choose the other door?",
+          typing: true,
+          id: Date.now(),
+          speed: 'normal'
+        });
+
+        setTimeout(() => {
+          setMessage(prev => ({ ...prev, typing: false }));
+          setShowButtons(true);
+        }, 3000);
+      };
+
+      // Start the sequence
+      showInitialMessage();
     }
   };
 
   const handleFinalChoice = (shouldSwitch) => {
     if (gameState.gamePhase !== 'montyRevealed') return;
 
+    setShowButtons(false);
     const finalDoorChoice = shouldSwitch
       ? getOtherDoor(gameState.doors, gameState.playerChoice, gameState.montyOpenedDoor)
       : gameState.playerChoice;
 
-    // Update player choice for the selection highlight first
-    setGameState(prev => ({
-      ...prev,
-      playerChoice: finalDoorChoice
-    }));
+    const revealSequence = () => {
+      // First message - opening door
+      setMessage({
+        text: `Opening ${shouldSwitch ? 'new' : 'chosen'} door...`,
+        typing: true,
+        id: Date.now(),
+        speed: 'fast'
+      });
 
-    // Then open the chosen door
-    setTimeout(() => {
-      setGameState(prev => ({
-      ...prev,
-      finalChoice: finalDoorChoice,
-      doors: {
-        ...prev.doors,
-        [finalDoorChoice]: { ...prev.doors[finalDoorChoice], isOpen: true }
-      },
-      gamePhase: 'revealing'
-    }));
-
-      const hasWon = determineWinner(gameState.doors, finalDoorChoice);
-
-      // After a delay, open all remaining doors
       setTimeout(() => {
+        setMessage(prev => ({ ...prev, typing: false }));
+        
+        // Open the chosen door
         setGameState(prev => ({
           ...prev,
-          doors: Object.entries(prev.doors).reduce((acc, [key, door]) => ({
-            ...acc,
-            [key]: { ...door, isOpen: true }
-          }), {}),
-          gamePhase: 'gameOver'
+          playerChoice: finalDoorChoice,
+          finalChoice: finalDoorChoice,
+          doors: {
+            ...prev.doors,
+            [finalDoorChoice]: { ...prev.doors[finalDoorChoice], isOpen: true }
+          },
+          gamePhase: 'revealing'
         }));
 
+        // Show result message after door opens
+        const hasWon = determineWinner(gameState.doors, finalDoorChoice);
         setTimeout(() => {
-          onGameOver(hasWon, shouldSwitch);
-        }, 1000);
+          setMessage({
+            text: hasWon ? "Let's see what's behind the other doors..." : "Let's see what you could have won...",
+            typing: true,
+            id: Date.now(),
+            speed: 'normal'
+          });
+
+          // Open all remaining doors after message
+          setTimeout(() => {
+            setMessage(prev => ({ ...prev, typing: false }));
+            
+            setGameState(prev => ({
+              ...prev,
+              doors: Object.entries(prev.doors).reduce((acc, [key, door]) => ({
+                ...acc,
+                [key]: { ...door, isOpen: true }
+              }), {}),
+              gamePhase: 'gameOver'
+            }));
+
+            // Finally trigger game over
+            setTimeout(() => {
+              onGameOver(hasWon, shouldSwitch);
+            }, 800);
+          }, 2000);
+        }, 1500);
       }, 1500);
-    }, 500); // Delay between selection highlight and door opening
+    };
+
+    // Start the reveal sequence
+    revealSequence();
   };
 
   return (
@@ -128,15 +164,16 @@ const GameScene = ({ onGameOver }) => {
         <div className="text-center mb-12">
           <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg blur opacity-75"></div>
           <h2 className="relative text-3xl md:text-4xl font-bold mb-4 p-4 bg-gray-900 rounded-lg">
-            <TypeWriter 
-              text={message.text} 
-              typing={message.typing} 
+            <TypeWriter
+              text={message.text}
+              typing={message.typing}
               id={message.id}
-              onComplete={() => setMessage(prev => ({ ...prev, typing: false }))} 
+              speed={message.speed}
+              onComplete={() => setMessage(prev => ({ ...prev, typing: false }))}
             />
           </h2>
         </div>
-        
+
         <div className="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-12">
           {Object.entries(gameState.doors).map(([number, door]) => (
             <Door
@@ -146,8 +183,8 @@ const GameScene = ({ onGameOver }) => {
               hasCar={door.hasCar}
               isSelected={parseInt(number) === gameState.playerChoice}
               isSelectable={gameState.gamePhase === 'initial' || (
-                gameState.gamePhase === 'montyRevealed' && 
-                !door.isOpen && 
+                gameState.gamePhase === 'montyRevealed' &&
+                !door.isOpen &&
                 parseInt(number) !== gameState.montyOpenedDoor
               )}
               onSelect={handleDoorSelect}
@@ -159,12 +196,12 @@ const GameScene = ({ onGameOver }) => {
           <div className="mt-12 flex flex-col sm:flex-row justify-center gap-6">
             <button
               onClick={() => handleFinalChoice(false)}
-              className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 
+              className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700
                          hover:from-blue-500 hover:to-blue-600 rounded-xl text-white font-bold
-                         transform transition-all duration-200 hover:scale-105 
+                         transform transition-all duration-200 hover:scale-105
                          shadow-lg hover:shadow-blue-500/50"
             >
-              <div className="absolute -inset-1 bg-blue-600 rounded-xl blur opacity-30 
+              <div className="absolute -inset-1 bg-blue-600 rounded-xl blur opacity-30
                             group-hover:opacity-50 transition-opacity"></div>
               <span className="relative">Stay with Door {gameState.playerChoice}</span>
             </button>

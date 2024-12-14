@@ -1,34 +1,48 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const TypeWriter = ({ text, typing, onComplete, id }) => {
+const TypeWriter = ({
+  text,
+  typing,
+  onComplete,
+  id,
+  speed = 'normal'
+}) => {
   const [displayText, setDisplayText] = useState('');
-  const [completed, setCompleted] = useState(false);
+
+  const getTypingInterval = () => {
+    const baseSpeed = {
+      slow: 80,
+      normal: 50,
+      fast: 30
+    }[speed] || 50;
+    return baseSpeed;
+  };
 
   useEffect(() => {
-    if (!typing || completed) return;
-    setDisplayText('');
+    if (!typing) return;
     
+    setDisplayText('');
     let currentIndex = 0;
-    const interval = setInterval(() => {
+    const interval = getTypingInterval();
+    
+    const timer = setInterval(() => {
       if (currentIndex < text.length) {
         currentIndex++;
         setDisplayText(text.slice(0, currentIndex));
       } else {
-        clearInterval(interval);
-        setCompleted(true);
+        clearInterval(timer);
         onComplete?.();
       }
-    }, 50);
+    }, interval);
 
-    return () => clearInterval(interval);
-  }, [text, typing, onComplete, id]);
+    return () => clearInterval(timer);
+  }, [text, typing, speed, onComplete]);
 
-  // Reset completed state when text changes
-  useEffect(() => {
-    setCompleted(false);
-  }, [text, id]);
-
-  return <span>{typing ? displayText : text}</span>;
+  return (
+    <span className="inline-block min-h-[1.5em]">
+      {typing ? displayText : text}
+    </span>
+  );
 };
 
 export default TypeWriter;
