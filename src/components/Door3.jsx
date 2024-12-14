@@ -6,7 +6,7 @@ const Door = ({ number, isOpen, hasCar, isSelected, onSelect, isSelectable }) =>
 
   const springProps = useSpring({
     rotateY: isOpen ? -105 : 0,
-    scale: isHovered && isSelectable ? 1.05 : 1,
+    scale: isHovered && isSelectable ? 1.05 : isSelected ? 1.05 : 1,
     config: { tension: 120, friction: 14 }
   });
 
@@ -43,7 +43,11 @@ const Door = ({ number, isOpen, hasCar, isSelected, onSelect, isSelectable }) =>
             r => `perspective(1500px) rotateY(${r}deg) scale(${springProps.scale.get()})`
           ),
         }}
-        className={`${isSelectable ? 'cursor-pointer' : 'cursor-default'}`}
+        className={`${!isOpen ? 'transition-all duration-300' : ''} ${
+          isSelectable ? 'cursor-pointer hover:ring-4 hover:ring-blue-400 hover:ring-offset-4 hover:ring-offset-gray-900' : 'cursor-default'
+        } ${
+          isSelected ? 'ring-4 ring-yellow-400 ring-offset-4 ring-offset-gray-900 shadow-2xl' : ''
+        }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => isSelectable && onSelect(number)}
