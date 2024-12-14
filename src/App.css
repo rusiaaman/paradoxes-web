@@ -1,0 +1,12 @@
+/* App-specific styles */
+.door-hover {
+  transition: transform 0.2s ease-in-out;
+}
+
+.door-hover:hover {
+  transform: scale(1.05);
+}
+
+.door-selected {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
