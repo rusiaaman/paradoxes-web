@@ -40,6 +40,25 @@ const Explanation = ({ hasWon, didSwitch, onPlayAgain }) => {
         />
       )}
       <div className="max-w-2xl p-8 bg-gray-800 rounded-xl text-white">
+        <div className="mb-8 p-4 bg-gradient-to-r from-gray-700 to-gray-600 rounded-lg">
+          <h2 className="text-2xl font-bold mb-2 text-center">Strategy Analysis</h2>
+          {didSwitch ? (
+            <p className="text-center text-lg">
+              You chose the optimal strategy by switching! 
+              {hasWon 
+                ? " And it paid off - congratulations! 🎉" 
+                : " Although you didn't win this time, it was still the best choice mathematically."}
+            </p>
+          ) : (
+            <p className="text-center text-lg">
+              You didn't choose the optimal strategy by staying.
+              {hasWon 
+                ? " However, congratulations on winning despite the odds! 🎉" 
+                : " The odds were against you, and unfortunately it didn't work out this time."}
+            </p>
+          )}
+        </div>
+
         <h2 className="text-4xl font-bold mb-6 text-center">
           {hasWon ? '🎉 Congratulations!' : '😔 Better luck next time!'}
         </h2>
