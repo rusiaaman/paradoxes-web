@@ -16,14 +16,14 @@ async function convertSVGToWebP(svgPath, webpPath) {
 }
 
 async function main() {
-  await convertSVGToWebP(
-    './public/assets/monty-hall-preview.svg',
-    './public/assets/monty-hall-preview.webp'
-  );
-  await convertSVGToWebP(
-    './public/assets/sleeping-beauty-preview.svg',
-    './public/assets/sleeping-beauty-preview.webp'
-  );
+  const [,, inputPath, outputPath] = process.argv;
+  
+  if (!inputPath || !outputPath) {
+    console.error('Usage: node convert.js <input.svg> <output.webp>');
+    process.exit(1);
+  }
+
+  await convertSVGToWebP(inputPath, outputPath);
 }
 
 main().catch(console.error);

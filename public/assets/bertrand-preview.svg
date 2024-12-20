@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34D399;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:0.2"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="url(#bgGradient)"/>
+  
+  <!-- Main Circle -->
+  <circle cx="400" cy="300" r="200" fill="none" stroke="#059669" stroke-width="3"/>
+  
+  <!-- Inscribed Triangle -->
+  <path d="M 573.2 300 L 313.4 127.32 L 313.4 472.68 Z" 
+        fill="none" stroke="#34D399" stroke-width="2" stroke-dasharray="10,10"/>
+  
+  <!-- Example Chords -->
+  <line x1="200" y1="200" x2="600" y2="400" stroke="#059669" stroke-width="3"/>
+  <line x1="300" y1="150" x2="500" y2="450" stroke="#34D399" stroke-width="3" opacity="0.5"/>
+  <line x1="250" y1="300" x2="550" y2="300" stroke="#10B981" stroke-width="3" opacity="0.7"/>
+</svg>
