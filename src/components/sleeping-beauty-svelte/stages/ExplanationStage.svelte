@@ -32,7 +32,7 @@ function handleComplete() {
         <div class="opacity-100">
           <NarrationText
             text={`You assessed the probability as ${probabilityText}. Let's explore why this is such a fascinating paradox.`}
-            skipTyping={$skipTyping}
+            skipTyping={true}
             on:complete={handleComplete}
           />
         </div>
@@ -80,7 +80,7 @@ function handleComplete() {
           <div class="min-h-[200px]">
             <NarrationText
               text={insightsText}
-              skipTyping={$skipTyping}
+              skipTyping={true}
               on:complete={handleInsightComplete}
             />
           </div>

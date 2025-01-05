@@ -37,7 +37,7 @@ function handleProbabilitySelect(event) {
         <div class="opacity-100 mt-4">
           <NarrationText
             text={perspectiveText}
-            skipTyping={$skipTyping}
+            skipTyping={true}
             on:complete={handleComplete}
           />
         </div>
