@@ -9,7 +9,7 @@ function ProbabilitySelector({ onSelect, options }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center space-y-6 bg-black/80 backdrop-blur-sm px-4 py-6 md:px-8 md:py-8 rounded-xl border border-white/10 shadow-2xl"
+      className="flex flex-col items-center space-y-6 bg-black/20 backdrop-blur-sm px-4 py-6 md:px-8 md:py-8 rounded-xl border border-white/10 shadow-2xl"
     >
       <div className="space-y-4 w-full max-w-md">
         {options.map((option) => (
@@ -22,7 +22,7 @@ function ProbabilitySelector({ onSelect, options }) {
               border border-white/10 backdrop-blur-sm shadow-lg
               ${selected === option.value 
                 ? 'bg-blue-600/40 border-blue-400/50 shadow-blue-500/20' 
-                : 'bg-black/40 hover:bg-white/10 hover:border-white/20'}
+                : 'bg-black/20 hover:bg-white/10 hover:border-white/20'}
             `}
           >
             <div className="relative">

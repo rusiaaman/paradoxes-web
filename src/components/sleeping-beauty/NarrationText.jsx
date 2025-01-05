@@ -1,79 +1,103 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useLayoutEffect } from 'react';
 import Typed from 'typed.js';
 import { motion } from 'framer-motion';
 
 function NarrationText({ text, onComplete, skipTyping, setSkipTyping }) {
   const elementRef = useRef(null);
   const typedRef = useRef(null);
-  const [hasCompleted, setHasCompleted] = useState(false);
-  const [isSkippable, setIsSkippable] = useState(true);
+  const finalTextRef = useRef('');
+  const [displayText, setDisplayText] = useState('');
+  const [isComplete, setIsComplete] = useState(false);
+  const onCompleteRef = useRef(onComplete);
+  
+  // Update onComplete ref when prop changes
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
-  // Cleanup function to handle proper teardown
-  const cleanup = useCallback(() => {
+  // Ensure display text stays visible
+  useLayoutEffect(() => {
+    if (isComplete && finalTextRef.current && !displayText) {
+      setDisplayText(finalTextRef.current);
+    }
+  }, [displayText, isComplete]);
+
+  const handleTypingComplete = useCallback((self) => {
+    if (self?.cursor) {
+      self.cursor.style.display = 'none';
+    }
+    
+    finalTextRef.current = text;
+    setDisplayText(text);
+    setIsComplete(true);
+    
+    // Call onComplete in next frame to ensure state is settled
+    requestAnimationFrame(() => {
+      onCompleteRef.current?.();
+    });
+  }, [text]);
+
+  const handleSkip = useCallback((e) => {
+    if (isComplete || !typedRef.current) return;
+
+    e.stopPropagation();
+    
+    // Cleanup typed instance first
     if (typedRef.current) {
       typedRef.current.destroy();
       typedRef.current = null;
     }
-  }, []);
-
-  // Handle completion of typing
-  const handleComplete = useCallback(() => {
-    setHasCompleted(true);
-    setIsSkippable(false);
-    onComplete?.();
-  }, [onComplete]);
-
-  // Handle skipping of typing animation
-  const handleSkip = useCallback((e) => {
-    if (!typedRef.current || !isSkippable) return;
     
-    e.stopPropagation();
-    cleanup();
-    
-    if (elementRef.current) {
-      elementRef.current.innerHTML = text;
-    }
-    
-    handleComplete();
-  }, [text, cleanup, handleComplete, isSkippable]);
+    // Then complete
+    handleTypingComplete();
+  }, [handleTypingComplete, isComplete]);
 
-  useEffect(() => {
-    if (!elementRef.current || hasCompleted) return;
-
-    cleanup(); // Clean up any existing instance
-    setIsSkippable(true);
-
-    // If skipTyping is true, show the text immediately
-    if (skipTyping) {
-      elementRef.current.innerHTML = text;
-      handleComplete();
+  useLayoutEffect(() => {
+    // If already complete, maintain text visibility
+    if (isComplete) {
+      setDisplayText(finalTextRef.current);
       return;
     }
 
-    // Initialize new typing instance with improved settings
-    typedRef.current = new Typed(elementRef.current, {
-      strings: [text],
-      typeSpeed: 35,
-      showCursor: true,
-      cursorChar: '▎',
-      loop: false,
-      onComplete: handleComplete,
-      startDelay: 400,
-      smartBackspace: true,
-      backSpeed: 30,
-      backDelay: 700,
-      fadeOut: true,
-      fadeOutDelay: 100,
-    });
+    // Handle skip request
+    if (skipTyping) {
+      finalTextRef.current = text;
+      setDisplayText(text);
+      setIsComplete(true);
+      onCompleteRef.current?.();
+      return;
+    }
 
-    // Add click listener for skipping
-    document.addEventListener('click', handleSkip);
+    // Start new typing animation
+    if (elementRef.current && text) {
+      const typed = new Typed(elementRef.current, {
+        strings: [text],
+        typeSpeed: 35,
+        showCursor: true,
+        cursorChar: '▎',
+        loop: false,
+        fadeOut: false,
+        backspace: 0,
+        onComplete: handleTypingComplete,
+        startDelay: 400,
+        contentType: 'html',
+      });
 
+      typedRef.current = typed;
+
+      // Add skip handler
+      document.addEventListener('click', handleSkip);
+    }
+
+    // Cleanup
     return () => {
-      cleanup();
+      if (typedRef.current) {
+        typedRef.current.destroy();
+        typedRef.current = null;
+      }
       document.removeEventListener('click', handleSkip);
     };
-  }, [text, skipTyping, handleComplete, handleSkip, cleanup]);
+  }, [text, skipTyping, handleTypingComplete, handleSkip, isComplete]);
 
   return (
     <motion.div
@@ -91,8 +115,9 @@ function NarrationText({ text, onComplete, skipTyping, setSkipTyping }) {
           maxWidth: '70ch',
           margin: '0 auto',
         }}
+        dangerouslySetInnerHTML={{ __html: displayText }}
       />
-      {isSkippable && !skipTyping && (
+      {!isComplete && !skipTyping && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

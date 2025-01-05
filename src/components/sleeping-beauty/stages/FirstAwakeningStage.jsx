@@ -14,8 +14,8 @@ function FirstAwakeningStage({ onComplete, skipTyping, setSkipTyping, addToHisto
           onLoadedData={() => console.log('Second video loaded')} 
         />
       </div>
-      <div className="absolute inset-0 flex items-end pb-32 justify-center">
-        <div className="max-w-2xl w-full px-4">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="max-w-2xl w-full px-4 py-8">
           <div className="bg-black/5 backdrop-blur-sm p-8 rounded-xl shadow-2xl">
             <div className="opacity-100">
               <NarrationText
