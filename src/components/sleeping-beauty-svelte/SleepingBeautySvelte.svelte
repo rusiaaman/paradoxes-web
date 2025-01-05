@@ -1,5 +1,4 @@
 <script>
-import { Link } from '@sveltejs/kit';
 import IntroStage from './stages/IntroStage.svelte';
 import FirstAwakeningStage from './stages/FirstAwakeningStage.svelte';
 import PerspectiveShiftStage from './stages/PerspectiveShiftStage.svelte';
@@ -29,12 +28,13 @@ $: {
 </script>
 
 <div class="relative min-h-screen bg-black text-white overflow-hidden">
-  <a 
-    href="/" 
-    class="absolute top-4 left-4 text-white hover:text-blue-300 transition-colors z-50"
+  <div 
+    role="link"
+    class="absolute top-4 left-4 text-white hover:text-blue-300 transition-colors z-50 cursor-pointer"
+    on:click={() => window.location.href = '/'}
   >
     ← Back to Home
-  </a>
+  </div>
   
   <svelte:component this={stageComponent} />
   
