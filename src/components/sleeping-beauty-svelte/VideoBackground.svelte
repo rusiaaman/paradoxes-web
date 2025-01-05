@@ -3,7 +3,7 @@ import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 import gsap from 'gsap';
 
 export let videoSource;
-export let isPlaying;
+export let isPlaying = true;
 
 const dispatch = createEventDispatcher();
 let video;
@@ -11,6 +11,23 @@ let overlay;
 let loaded = false;
 let error = null;
 let timeout;
+
+$: if (video && typeof isPlaying !== 'undefined') {
+  if (isPlaying) {
+    try {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log("Video play error:", error);
+        });
+      }
+    } catch (error) {
+      console.log("Video play error:", error);
+    }
+  } else {
+    video.pause();
+  }
+}
 
 onMount(() => {
   if (!video) return;

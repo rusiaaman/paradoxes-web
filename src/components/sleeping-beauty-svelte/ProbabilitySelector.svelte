@@ -2,21 +2,17 @@
 import { createEventDispatcher } from 'svelte';
 import { fly, scale } from 'svelte/transition';
 
-export let options;
+export let options = [];
 let selected = null;
 
 const dispatch = createEventDispatcher();
 
 function handleSelect(value) {
-  if (value === selected) {
-    selected = null;
-  } else {
-    selected = value;
-  }
+  selected = value === selected ? null : value;
 }
 
 function handleSubmit() {
-  if (selected) {
+  if (selected !== null) {
     dispatch('select', selected);
   }
 }

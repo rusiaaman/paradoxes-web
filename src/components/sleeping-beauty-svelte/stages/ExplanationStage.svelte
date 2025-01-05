@@ -1,9 +1,12 @@
 <script>
+import { fade } from 'svelte/transition';
 import NarrationText from '../NarrationText.svelte';
 import { history, probability, skipTyping } from '../libs/stores.js';
 
 let probabilityText;
 $: probabilityText = $probability === 0.5 ? "1/2 (50%)" : "1/3 (33.3%)";
+
+const insightsText = "This paradox reveals deep questions about probability and consciousness. Does your subjective experience of awakening change the probability? Can the same event have different probabilities from different perspectives? The debate continues in philosophy and mathematics, showing how simple setups can lead to profound questions.";
 
 let textCompleted = false;
 
@@ -21,10 +24,11 @@ function handleComplete() {
 
 <div 
   class="relative w-full h-screen bg-gradient-to-b from-purple-900 to-black overflow-hidden"
+  in:fade={{duration: 500}}
 >
   <div class="absolute inset-0 flex items-center justify-center">
     <div class="w-full md:w-[calc(100vw-26rem)] max-w-3xl px-4 py-6 md:p-6 max-h-screen overflow-y-auto mr-4">
-      <div class="bg-black/5 backdrop-blur-sm p-8 rounded-xl shadow-2xl space-y-8">
+      <div class="bg-black/5 backdrop-blur-sm p-8 rounded-xl shadow-2xl space-y-8" in:fade={{duration: 500, delay: 200}}>
         <div class="opacity-100">
           <NarrationText
             text={`You assessed the probability as ${probabilityText}. Let's explore why this is such a fascinating paradox.`}
@@ -33,7 +37,7 @@ function handleComplete() {
           />
         </div>
         
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8" in:fade={{duration: 300, delay: 400}}>
           <div class="bg-transparent backdrop-blur-md border border-white/10 p-6 rounded-xl">
             <h3 class="text-xl font-bold text-blue-400 mb-4 opacity-100">Halfers Argument (1/2)</h3>
             <ul class="space-y-3 text-gray-200 opacity-100">
@@ -71,18 +75,18 @@ function handleComplete() {
           </div>
         </div>
 
-        <div class="bg-transparent backdrop-blur-md border border-white/10 p-6 rounded-xl">
+        <div class="bg-transparent backdrop-blur-md border border-white/10 p-6 rounded-xl" in:fade={{duration: 300, delay: 600}}>
           <h3 class="text-xl font-bold text-blue-400 mb-4 opacity-100">Key Insights</h3>
           <div class="min-h-[200px]">
             <NarrationText
-              text="This paradox reveals deep questions about probability and consciousness. Does your subjective experience of awakening change the probability? Can the same event have different probabilities from different perspectives? The debate continues in philosophy and mathematics, showing how simple setups can lead to profound questions."
+              text={insightsText}
               skipTyping={$skipTyping}
               on:complete={handleInsightComplete}
             />
           </div>
         </div>
 
-        <div class="flex justify-center gap-4">
+        <div class="flex justify-center gap-4" in:fade={{duration: 300, delay: 800}}>
           <a
             href="https://www.youtube.com/watch?v=XeSu9fBJ2sI"
             target="_blank"

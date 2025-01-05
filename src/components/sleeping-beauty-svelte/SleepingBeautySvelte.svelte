@@ -1,4 +1,5 @@
 <script>
+import { fade } from 'svelte/transition';
 import IntroStage from './stages/IntroStage.svelte';
 import FirstAwakeningStage from './stages/FirstAwakeningStage.svelte';
 import PerspectiveShiftStage from './stages/PerspectiveShiftStage.svelte';
@@ -36,7 +37,19 @@ $: {
     ← Back to Home
   </div>
   
-  <svelte:component this={stageComponent} />
+  {#key $currentStage}
+    <div in:fade={{duration: 500}}>
+      {#if $currentStage === 'intro'}
+        <IntroStage />
+      {:else if $currentStage === 'firstAwakening'}
+        <FirstAwakeningStage />
+      {:else if $currentStage === 'perspectiveShift'}
+        <PerspectiveShiftStage />
+      {:else if $currentStage === 'explanation'}
+        <ExplanationStage />
+      {/if}
+    </div>
+  {/key}
   
   {#if $history.length > 0}
     <HistoryPanel history={$history} />

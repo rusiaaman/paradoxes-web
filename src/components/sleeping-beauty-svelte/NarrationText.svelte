@@ -3,15 +3,43 @@ import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 import Typed from 'typed.js';
 import { fade, fly } from 'svelte/transition';
 
-export let text;
-export let skipTyping;
+export let text = '';
+export let skipTyping = false;
 
 const dispatch = createEventDispatcher();
 let elementRef;
 let typed = null;
-let finalText = '';
 let displayText = '';
 let isComplete = false;
+
+$: if (text && !displayText && !typed) {
+  if (skipTyping) {
+    displayText = text;
+    isComplete = true;
+    dispatch('complete');
+  } else {
+    initTyping();
+  }
+}
+
+function initTyping() {
+  if (elementRef && text) {
+    typed = new Typed(elementRef, {
+      strings: [text],
+      typeSpeed: 35,
+      showCursor: true,
+      cursorChar: '▎',
+      loop: false,
+      fadeOut: false,
+      onComplete: () => {
+        displayText = text;
+        isComplete = true;
+        dispatch('complete');
+        typed?.cursor?.style.display = 'none';
+      }
+    });
+  }
+}
 
 const handleTypingComplete = () => {
   if (typed?.cursor) {
@@ -95,7 +123,11 @@ onMount(() => {
     class="text-lg md:text-xl text-white/90 font-medium leading-relaxed tracking-wide"
     style="min-height: 6rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5); max-width: 70ch; margin: 0 auto;"
   >
-    {@html displayText}
+    {#if displayText}
+      {@html displayText}
+    {:else}
+      <span>&nbsp;</span>
+    {/if}
   </div>
   
   {#if !isComplete && !skipTyping}
@@ -107,6 +139,15 @@ onMount(() => {
     </div>
   {/if}
 </div>
+
+<svelte:window on:click={() => {
+  if (!isComplete && !skipTyping && typed) {
+    typed.destroy();
+    displayText = text;
+    isComplete = true;
+    dispatch('complete');
+  }
+}}/>
 
 <style>
   .fade-enter {
