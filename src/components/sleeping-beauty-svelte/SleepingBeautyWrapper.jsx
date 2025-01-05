@@ -6,16 +6,28 @@ const SleepingBeautyWrapper = () => {
   const svelteComponent = useRef(null);
 
   useEffect(() => {
-    if (svelteContainerRef.current) {
-      svelteComponent.current = new SleepingBeautyComponent({
-        target: svelteContainerRef.current
+    if (!svelteContainerRef.current) return;
+    
+    try {
+      const target = svelteContainerRef.current;
+      svelteComponent.current = null;
+      
+      // Create component instance
+      const component = new SleepingBeautyComponent({
+        target: target,
+        props: {}
       });
 
+      svelteComponent.current = component;
+
+      // Cleanup on unmount
       return () => {
         if (svelteComponent.current) {
           svelteComponent.current.$destroy();
         }
       };
+    } catch (error) {
+      console.error('Failed to initialize Svelte component:', error);
     }
   }, []);
 
