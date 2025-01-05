@@ -33,16 +33,18 @@ function initTyping() {
       fadeOut: false,
       onComplete: () => {
         displayText = text;
-        isComplete = true;
-        dispatch('complete');
-        typed?.cursor?.style.display = 'none';
+          isComplete = true;
+          dispatch('complete');
+          if (typed && typed.cursor) {
+            typed.cursor.style.display = 'none';
+          }
       }
     });
   }
 }
 
 const handleTypingComplete = () => {
-  if (typed?.cursor) {
+  if (typed && typed.cursor) {
     typed.cursor.style.display = 'none';
   }
   
