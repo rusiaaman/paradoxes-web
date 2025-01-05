@@ -1,5 +1,6 @@
 <script>
 import { createEventDispatcher } from 'svelte';
+import { fly, scale } from 'svelte/transition';
 
 export let options;
 let selected = null;
@@ -23,7 +24,7 @@ function handleSubmit() {
 
 <div
   class="flex flex-col items-center space-y-6 bg-black/20 backdrop-blur-sm px-4 py-6 md:px-8 md:py-8 rounded-xl border border-white/10 shadow-2xl"
-  in:fade={{duration: 500, y: 20}}
+  in:fly={{ y: 20, duration: 500 }}
 >
   <div class="space-y-4 w-full max-w-md">
     {#each options as option}
@@ -51,7 +52,7 @@ function handleSubmit() {
             {#if selected === option.value}
               <div
                 class="w-2 h-2 bg-white rounded-full"
-                in:scale={{duration: 200}}
+                in:scale={{ duration: 200, start: 0 }}
               ></div>
             {/if}
           </div>

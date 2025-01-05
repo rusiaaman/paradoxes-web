@@ -1,6 +1,7 @@
 <script>
 import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 import Typed from 'typed.js';
+import { fade, fly } from 'svelte/transition';
 
 export let text;
 export let skipTyping;
@@ -88,7 +89,7 @@ onMount(() => {
 </script>
 
 <div class="relative px-4 pb-6 md:pb-8" 
-  in:fade={{duration: 500, y: 20}}>
+  in:fly={{ y: 20, duration: 500 }}>
   <div 
     bind:this={elementRef}
     class="text-lg md:text-xl text-white/90 font-medium leading-relaxed tracking-wide"

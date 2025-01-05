@@ -1,4 +1,5 @@
 <script>
+import { fly } from 'svelte/transition';
 export let history = [];
 </script>
 
@@ -9,7 +10,7 @@ export let history = [];
       {#each history as message, i}
         <div 
           class="text-white/80 text-sm leading-relaxed p-4 rounded-lg bg-white/5 border border-white/10"
-          in:fade={{duration: 300, delay: i * 100}}>
+          in:fly={{ y: 10, duration: 300, delay: i * 100 }}>
           {message}
         </div>
       {/each}
