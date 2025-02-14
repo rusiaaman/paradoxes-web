@@ -73,7 +73,7 @@ const HomePage = () => {
     {
       title: "Sleeping Beauty Paradox",
       description: "Dive into a fascinating thought experiment that blends probability with consciousness. When Beauty awakens, what should she believe about a coin flip that determines her awakenings? Experience this mind-bending paradox through an immersive interactive journey.",
-      link: "/sleeping-beauty-svelte",
+      link: "/sleeping-beauty",
       image: "/assets/sleeping-beauty-preview.webp",
       gradientFrom: "#FF3E00",
       gradientTo: "#FF8C00"
